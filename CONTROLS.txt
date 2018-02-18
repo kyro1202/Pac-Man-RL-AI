@@ -1,0 +1,15 @@
+CONTROLS :-
+
+Movement:
+	"W" / UpArrowKey - Move Up
+	"S" / DownArrowKey - Move Down
+	"A" / LeftArrowKey - Move Left
+	"D" / RightArrowKey - Move Right
+	"Q" / CloseButton - Closes the game
+
+INSTRUCTIONS :-
+
+Requirements - Python and Pygame
+
+Objective -
+    To collect all the coins without getting eaten by the ghosts.
