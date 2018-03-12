@@ -84,7 +84,6 @@ class featureExtractor:
 		visited[pac.x][pac.y] = 1
 		while 1:
 			[X, Y, DIST] = Q.pop()
-			print (str)(X) + " " + (str)(Y) + " " + (str)(DIST)
 			visited[X][Y] = 1
 			if [X, Y] == [ink.x, ink.y]:
 				return DIST
