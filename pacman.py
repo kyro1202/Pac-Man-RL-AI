@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import * 
 from random import randint
 from classes import *
+from featureExtractor import *
 
 if __name__ == "__main__" or __name__ == "pacman" :
 
@@ -9,11 +10,11 @@ if __name__ == "__main__" or __name__ == "pacman" :
     HERO = Pacman()
     VILLIAN = Blinky()
     VILLIAN2 = Inky()
+    FEATURE = featureExtractor()
     pygame.init()
     GAME.scorefont = pygame.font.Font(None,30)
     done = False
     clock = pygame.time.Clock()
-
     bsl = 0
     isl = 0
 
@@ -48,7 +49,9 @@ if __name__ == "__main__" or __name__ == "pacman" :
             VILLIAN2.resetinky()
             GAME.level += 1	
         GAME.scoredisp()
-        GAME.leveldisp()        
+        GAME.leveldisp() 
+        FEATURE.dispInky(HERO, VILLIAN2, GAME)
+        FEATURE.dispBlinky(HERO, VILLIAN, GAME)
         clock.tick(10)
         pygame.display.flip()
     pygame.quit()
