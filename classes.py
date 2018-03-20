@@ -21,6 +21,7 @@ class Maze():
 	self.level = 1	
 	self.grid = []
 	self.wall = []
+	self.WALL = [[0 for i in range(1000)] for j in range(1000)]
 	self.intersections = [(1,5),(4,3),(4,7),(3,5),(6,3),(6,5),(6,7),(13,3),(13,5),(13,7),(15,3),(15,7),(16,5),(18,5)]
 	self.countfinal = 0
 	self.make()
@@ -31,47 +32,76 @@ class Maze():
 		for i in range(0,20):
 			self.wall.append([i,0])
 			self.wall.append([i,10])
+			self.WALL[i][0] = 1
+			self.WALL[i][10] = 1
 		for j in range(0,11):
 			self.wall.append([0,j])
 			self.wall.append([19,j])
+			self.WALL[0][j] = 1
+			self.WALL[19][j] = 1
 		for j in range(1,3):
 			self.wall.append([5,j])
-			self.wall.append([14,j])	
+			self.wall.append([14,j])
+			self.WALL[5][j] = 1
+			self.WALL[14][j] = 1	
 		for i in range(2,4):
 			self.wall.append([i,2])
+			self.WALL[i][2] = 1
 		for i in range(7,13):
 			self.wall.append([i,2])
+			self.WALL[i][2] = 1
 		for i in range(16,18):
 			self.wall.append([i,2])
+			self.WALL[i][2] = 1
 		for j in range(3,5):
 			self.wall.append([2,j])
 			self.wall.append([17,j])
+			self.WALL[2][j] = 1
+			self.WALL[17][j] = 1
 		for i in range(4,6):
 			self.wall.append([i,4])
 			self.wall.append([i,6])
+			self.WALL[i][4] = 1
+			self.WALL[i][6] = 1
 		for i in range(14,16):
 			self.wall.append([i,4])
 			self.wall.append([i,6])
+			self.WALL[i][4] = 1
+			self.WALL[i][6] = 1
 		for i in range(7,9):
 			self.wall.append([i,4])
+			self.WALL[i][4] = 1
 		for i in range(11,13):
 			self.wall.append([i,4])
+			self.WALL[i][4] = 1
 		for i in range(7,13):
 			self.wall.append([i,6])
+			self.WALL[i][6] = 1
 		self.wall.append([7,5])
+		self.WALL[7][5] = 1
 		self.wall.append([12,5])
+		self.WALL[12][5] = 1
 		for j in range(6,8):
 			self.wall.append([2,j])
 			self.wall.append([17,j])
+			self.WALL[2][j] = 1
+			self.WALL[17][j] = 1
 		for i in range(7,13):
 			self.wall.append([i,8])
+			self.WALL[i][8] = 1
 		self.wall.append([2,8])
+		self.WALL[2][8] = 1
 		self.wall.append([3,8])
+		self.WALL[3][8] = 1
 		self.wall.append([16,8])
+		self.WALL[16][8] = 1
 		self.wall.append([17,8])
+		self.WALL[17][8] = 1
 		for j in range(8,10):
 			self.wall.append([5,j])
 			self.wall.append([14,j])
+			self.WALL[5][j] = 1
+			self.WALL[14][j] = 1
 		for row in range(11):
 			self.grid.append([])
 			for column in range(20):
@@ -83,6 +113,7 @@ class Maze():
     def reset(self):
 		self.grid = []
 		self.wall = []
+		self.WALL = [[0 for i in range(1000)] for j in range(1000)]
 		self.countfinal = 0
 		self.make()	
 		return self
