@@ -74,18 +74,114 @@ class PriorityQueue:
         return len(self.heap) == 0
 
 class featureExtractor:
+	
+	def Action(self, action):
+		if action == -1:
+			return [0, 0]
+		elif action == 0:
+			return [1, 0]
+		elif action == 1:
+			return [0, 1]
+		elif action == 2:
+			return [-1, 0]
+		elif action == 3:
+ 			return [0, -1]
+	def getBlinkyNewPos(self, pac, blink, G, action):
+		## ACTION SHOULD BE VALID
+		[dx, dy] = self.Action(action)
+		if (blink.x, blink.y) not in G.intersections:
+			if ([blink.x-1, blink.y] not in G.wall and blink.prev != 1) :
+				move = 0
+			elif ([blink.x+1, blink.y] not in G.wall and blink.prev != 0):
+				move = 1
+			elif ([blink.x, blink.y-1] not in G.wall and blink.prev != 3):
+				move = 2
+			elif ([blink.x, blink.y+1] not in G.wall and blink.prev != 2):
+				move = 3
+		else:
+			dist = [1000,1000,1000,1000]
+			if [blink.x-1, blink.y] not in G.wall:
+				dist[0] = math.sqrt((pac.x + dx -blink.x+1)*(pac.x + dx -blink.x+1)+(pac.y + dy -blink.y)*(pac.y + dy -blink.y))
+			if [blink.x+1, blink.y] not in G.wall:
+				dist[1] = math.sqrt((pac.x + dx -blink.x-1)*(pac.x + dx -blink.x-1)+(pac.y + dy -blink.y)*(pac.y + dy -blink.y))
+			if [blink.x,blink.y-1] not in G.wall:
+				dist[2] = math.sqrt((pac.x + dx -blink.x)*(pac.x + dx -blink.x)+(pac.y + dy -blink.y+1)*(pac.y + dy -blink.y+1))
+			if [blink.x,blink.y+1] not in G.wall:
+				dist[3] = math.sqrt((pac.x + dx -blink.x)*(pac.x + dx - blink.x)+(pac.y + dy -blink.y-1)*(pac.y + dy -blink.y-1))
+			#print dist
+			move = dist.index(min(dist))
+			#print move
+		if move == 0:
+			return [blink.x - 1, blink.y]
+		elif move == 1:
+			return [blink.x + 1, blink.y]
+		elif move == 2:
+			return [blink.x, blink.y + 1]
+		elif move == 3:
+			return [blink.x, blink.y - 1]
+	def getInkyNewPos(self, pac, ink, G, action):
+		## ACTION SHOULD BE VALID
+		[dx, dy] = self.Action(action)
+		if (ink.x,ink.y) not in G.intersections:
+			if ([ink.x-1,ink.y] not in G.wall and ink.prev != 1) :
+					move = 0
+			elif ([ink.x+1,ink.y] not in G.wall and ink.prev != 0):
+				move = 1
+			elif ([ink.x,ink.y-1] not in G.wall and ink.prev != 3):
+				move = 2
+			elif ([ink.x,ink.y+1] not in G.wall and ink.prev != 2):
+				move = 3
+		else:
+			dist = [1000,1000,1000,1000]
+			tx = 0
+			ty = 0
+			if pac.dirc is 0:
+				ty = pac.y
+				tx = max(0,pac.x + dx -2)
+			elif pac.dirc is 1:
+					ty = pac.y
+					tx = min(19,pac.x + dx +2)
+			elif pac.dirc is 2:
+					tx = pac.x
+					ty = max(0,pac.y + dy - 2)
+			elif pac.dirc is 3:
+					tx = pac.x
+					ty = min(10,pac.y + dy +2)
+			if [ink.x-1,ink.y] not in G.wall:
+				dist[0] = math.sqrt((tx-ink.x+1)*(tx-ink.x+1)+(ty-ink.y)*(ty-ink.y))
+			if [ink.x+1,ink.y] not in G.wall:
+				dist[1] = math.sqrt((tx-ink.x-1)*(tx-ink.x-1)+(ty-ink.y)*(ty-ink.y))
+			if [ink.x,ink.y-1] not in G.wall:
+				dist[2] = math.sqrt((tx-ink.x)*(tx-ink.x)+(ty-ink.y+1)*(ty-ink.y+1))
+			if [ink.x,ink.y+1] not in G.wall:
+				dist[3] = math.sqrt((tx-ink.x)*(tx-ink.x)+(ty-ink.y-1)*(ty-ink.y-1))
+			#print dist
+			move = dist.index(min(dist))
+			#print move
+		if move == 0:
+			return [ink.x - 1, ink.y]
+		elif move == 1:
+			return [ink.x + 1, ink.y]
+		elif move == 2:
+			return [ink.x, ink.y + 1]
+		elif move == 3:
+			return [ink.x, ink.y - 1]
+		
 
-	def getInkyDist(self, pac, ink, g):
+	def getInkyDist(self, pac, ink, g, action):
+		## ACTION SHOULD BE VALID
 		## BFS
 		visited = [[0 for i in range(1000)] for j in range(1000)]
 		Q = Queue()
 		dist = 0
-		Q.push([pac.x, pac.y, dist])
-		visited[pac.x][pac.y] = 1
+		[dx, dy] = self.Action(action)
+		Q.push([pac.x + dx, pac.y + dy, dist])
+		visited[pac.x + dx][pac.y + dy] = 1
+		inky_x, inky_y = self.getInkyNewPos(pac, ink, g, action)
 		while 1:
 			[X, Y, DIST] = Q.pop()
 			visited[X][Y] = 1
-			if [X, Y] == [ink.x, ink.y]:
+			if [X, Y] == [inky_x, inky_y]:
 				return DIST
 			if g.WALL[X + 1][Y] == 0 and visited[X + 1][Y] == 0:
 				Q.push([X + 1, Y, DIST + 1])
@@ -96,17 +192,20 @@ class featureExtractor:
 			if g.WALL[X][Y - 1] == 0 and visited[X][Y - 1] == 0:
 				Q.push([X, Y - 1, DIST + 1])
 
-	def getBlinkyDist(self, pac, blink, g):
+	def getBlinkyDist(self, pac, blink, g, action):
+		## ACTION SHOULD BE VALID
 		## BFS
 		visited = [[0 for i in range(1000)] for j in range(1000)]
 		Q = Queue()
 		dist = 0
-		Q.push([pac.x, pac.y, dist])
-		visited[pac.x][pac.y] = 1
+		[dx, dy] = self.Action(action)
+		Q.push([pac.x + dx, pac.y + dy, dist])
+		visited[pac.x + dx][pac.y + dy] = 1
+		blinky_x, blinky_y = self.getBlinkyNewPos(pac, blink, g, action)
 		while 1:
 			[X, Y, DIST] = Q.pop()
 			visited[X][Y] = 1
-			if [X, Y] == [blink.x, blink.y]:
+			if [X, Y] == [blinky_x, blinky_y]:
 				return DIST
 			if g.WALL[X + 1][Y] == 0 and visited[X + 1][Y] == 0:
 				Q.push([X + 1, Y, DIST + 1])
@@ -116,17 +215,19 @@ class featureExtractor:
 				Q.push([X - 1, Y, DIST + 1])
 			if g.WALL[X][Y - 1] == 0 and visited[X][Y - 1] == 0:
 				Q.push([X, Y - 1, DIST + 1])
-	def getCoinDist(self, pac, g):
+	def getCoinDist(self, pac, g, action):
+		## ACTION SHOULD BE VALID
 		## BFS
 		visited = [[0 for i in range(1000)] for j in range(1000)]
 		Q = Queue()
 		dist = 0
-		Q.push([pac.x, pac.y, dist])
-		visited[pac.x][pac.y] = 1
+		[dx, dy] = self.Action(action)
+		Q.push([pac.x + dx, pac.y + dy, dist])
+		visited[pac.x + dx][pac.y + dy] = 1
 		while 1:
 			[X, Y, DIST] = Q.pop()
 			visited[X][Y] = 1
-			if g.grid[Y][X] == 0:
+			if g.grid[Y][X] == 0 and X != pac.x + dx and Y != pac.y + dy:
 				return DIST
 			if g.WALL[X + 1][Y] == 0 and visited[X + 1][Y] == 0:
 				Q.push([X + 1, Y, DIST + 1])
@@ -138,6 +239,32 @@ class featureExtractor:
 				Q.push([X, Y - 1, DIST + 1])
 			if Q.isEmpty():
 				return 0
+	def getIntDist(self, pac, g, action):
+		## ACTION SHOULD BE VALID
+		## BFS
+		visited = [[0 for i in range(1000)] for j in range(1000)]
+		Q = Queue()
+		dist = 0
+		[dx, dy] = self.Action(action)
+		Q.push([pac.x + dx, pac.y + dy, dist])
+		visited[pac.x + dx][pac.y + dy] = 1
+		while 1:
+			[X, Y, DIST] = Q.pop()
+			visited[X][Y] = 1
+			if [X, Y] in g.intersections:
+				return DIST
+			if g.WALL[X + 1][Y] == 0 and visited[X + 1][Y] == 0:
+				Q.push([X + 1, Y, DIST + 1])
+			if g.WALL[X][Y + 1] == 0 and visited[X][Y + 1] == 0:
+				Q.push([X, Y + 1, DIST + 1])
+			if g.WALL[X - 1][Y] == 0 and visited[X - 1][Y] == 0:
+				Q.push([X - 1, Y, DIST + 1])
+
+			if g.WALL[X][Y - 1] == 0 and visited[X][Y - 1] == 0:
+				Q.push([X, Y - 1, DIST + 1])
+			if Q.isEmpty():
+				return 0
+		
 	def getCoin0Dist(self, pac, g):
 		## BFS
 		visited = [[0 for i in range(1000)] for j in range(1000)]
@@ -250,17 +377,18 @@ class featureExtractor:
 			return 3
 		
 	def dispInky(self, pac, ink, g):
-		distext = g.scorefont.render("Inky Distance: "+(str)(self.getInkyDist(pac, ink, g)), 1, g.WHITE)
+		distext = g.scorefont.render("Inky Distance: "+(str)(self.getInkyDist(pac, ink, g, 0)), 1, g.WHITE)
        		g.screen.blit(distext, (280, 610))
 	def dispBlinky(self, pac, blink, g):
-		distext = g.scorefont.render("Blinky Distance: "+(str)(self.getBlinkyDist(pac, blink, g)), 1, g.WHITE)
+		distext = g.scorefont.render("Blinky Distance: "+(str)(self.getBlinkyDist(pac, blink, g, 0)), 1, g.WHITE)
        		g.screen.blit(distext, (280, 630))
 	def dispCoin(self, pac, g):
-		distext = g.scorefont.render("Coin Distance: "+(str)(self.getCoinDist(pac, g)), 1, g.WHITE)
+		distext = g.scorefont.render("Coin Distance: "+(str)(self.getCoinDist(pac, g, 0)), 1, g.WHITE)
        		g.screen.blit(distext, (280, 650))
 	def dispDir(self, pac, g):
-		distext = g.scorefont.render("Coin Direction: "+(str)(self.getDirToCoin(pac, g)), 1, g.WHITE)
+		distext = g.scorefont.render("Coin Direction: "+(str)(self.getDirToCoin(pac, g, 0)), 1, g.WHITE)
        		g.screen.blit(distext, (280, 670))
+
 
 
 
