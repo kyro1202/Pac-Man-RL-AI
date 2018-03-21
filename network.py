@@ -11,6 +11,7 @@ class network:
         self.q_value = tf.placeholder(tf.float32,[None],name=self.name + '_q_value')
         self.actions = tf.placeholder(tf.float32,[None,par['num_act']],name=self.name + '_actions')
         self.rewards = tf.placeholder(tf.float32,[None],name=self.name + '_rewards')
+        self.terminals = tf.placeholder(tf.float32, [None],name=self.name + '_terminals')
 
         #layer1
         layer_name = 'layer1'; size1 = 5; size2 = 10; 
@@ -28,4 +29,27 @@ class network:
 
         #Q,cost,optimizer
         self.discount = tf.constant(self.par['discount'])
-        
+        self.y_updated = tf.add(self.rewards, tf.mul(1.0-self.terminals, tf.mul(self.discount, self.q_value)))
+        self.Q_pred = tf.reduce_sum(tf.mul(self.y,self.actions), reduction_indices=1)
+        self.cost = tf.reduce_sum(tf.pow(tf.sub(self.y_updated, self.Q_pred), 2))
+        if self.par['ckpt_file'] is not None:
+            self.global_step = tf.Variable(int(self.par['ckpt_file'].split('_')[-1]),name='global_step', trainable=False)
+		else:
+			self.global_step = tf.Variable(0, name='global_step', trainable=False)
+        self.rmsprop = tf.train.RMSPropOptimizer(self.par['lr'],self.par['rms_decay'],0.0,self.par['rms_eps']).minimize(self.cost,global_step=self.global_step)
+        self.saver = tf.train.Saver()
+        self.sess.run(tf.global_variables_initializer())
+        if self.par['ckpt_file'] is not None:
+            print 'loading checkpoint...'
+            self.saver.restore(self.sess,self.par['ckpt_file'])
+
+    def train(self,bat_s,bat_a,bat_t,bat_n,bat_r):
+        feed_dict={self.x: bat_n, self.q_value: np.zeros(bat_n.shape[0]), self.actions: bat_a, self.terminals: bat_t, self.rewards: bat_r}
+        q_value = self.sess.run(self.y,feed_dict = feed_dict)
+        q_value = np.amax(q_value,axis = 1)
+        feed_dict={self.x: bat_s, self.q_value: q_value, self.actions: bat_a, self.terminals:bat_t, self.rewards: bat_r}
+        _,cnt,cost = self.sess.run([self.rmsprop,self.global_step,self.cost],feed_dict=feed_dict)
+        return cnt,cost
+
+    def save_network(self,filename):
+        self.saver.save(self.sess,filename)
