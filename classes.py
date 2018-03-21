@@ -375,7 +375,7 @@ class Inky(Person,Pacman):
 			tx = 0
 			ty = 0
 			if pac.dirc is 0:
-				ty	 = pac.y
+    				ty	 = pac.y
 				tx = max(0,pac.x-2)
 			elif pac.dirc is 1:
 					ty = pac.y
