@@ -374,8 +374,8 @@ class featureExtractor:
 		if dist2 < dist0 and dist2 < dist1 and dist2 < dist3:
 			return 2
 		if dist3 < dist1 and dist3 < dist2 and dist3 < dist0:
-			return 3
-		
+			return 3		
+
 	def dispInky(self, pac, ink, g):
 		distext = g.scorefont.render("Inky Distance: "+(str)(self.getInkyDist(pac, ink, g, 0)), 1, g.WHITE)
        		g.screen.blit(distext, (280, 610))
