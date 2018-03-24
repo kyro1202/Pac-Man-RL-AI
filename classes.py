@@ -242,18 +242,30 @@ class Pacman(Person):
 	    else:
 			return False
 
-	def pacmove(self,G):
-		keys = pygame.key.get_pressed()
-		if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-			self.pacleft(G)
-			self.dirc = 0
-		elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+	def pacmove(self,G,action):
+		# keys = pygame.key.get_pressed()
+		# if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+		# 	self.pacleft(G)
+		# 	self.dirc = 0
+		# elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+		# 	self.pacright(G)
+		# 	self.dirc = 1
+		# elif keys[pygame.K_UP] or keys[pygame.K_w]:
+		# 	self.pacup(G)
+		# 	self.dirc = 2
+		# elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
+		# 	self.pacdown(G)
+		# 	self.dirc = 3
+		if action is 0:
 			self.pacright(G)
-			self.dirc = 1
-		elif keys[pygame.K_UP] or keys[pygame.K_w]:
+			self.dirc = 0
+		elif action is 1:
 			self.pacup(G)
+			self.dirc = 1
+		elif action is 2:
+			self.pacleft(G)
 			self.dirc = 2
-		elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
+		elif action is 3:
 			self.pacdown(G)
 			self.dirc = 3
 
@@ -374,13 +386,13 @@ class Inky(Person,Pacman):
 			dist = [1000,1000,1000,1000]
 			tx = 0
 			ty = 0
-			if pac.dirc is 0:
+			if pac.dirc is 2:
     				ty	 = pac.y
 				tx = max(0,pac.x-2)
-			elif pac.dirc is 1:
+			elif pac.dirc is 0:
 					ty = pac.y
 					tx = min(19,pac.x+2)
-			elif pac.dirc is 2:
+			elif pac.dirc is 1:
 					tx = pac.x
 					ty = max(0,pac.y - 2)
 			elif pac.dirc is 3:

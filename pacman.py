@@ -25,14 +25,14 @@ if __name__ == "__main__" or __name__ == "pacman" :
             if event.type == KEYDOWN:
                 if event.key == K_q:
                     done = True
-        HERO.pacmove(GAME)        
+        #HERO.pacmove(GAME)        
         GAME.screen.fill(GAME.BLACK)
-        if bsl is 0:
-            VILLIAN.blinkymove(GAME,HERO)
-        if isl is 0:
-            VILLIAN2.inkymove(GAME,HERO)
-        bsl = abs(1-bsl)
-        isl = abs(1-isl)     
+        #if bsl is 0:
+            #VILLIAN.blinkymove(GAME,HERO)
+        #if isl is 0:
+            #VILLIAN2.inkymove(GAME,HERO)
+        #bsl = abs(1-bsl)
+        #isl = abs(1-isl)     
         GAME.countfinal=0
         GAME.dispmaze()
         GAME.drawwall() 
