@@ -4,23 +4,22 @@ import time
 
 class database:
 	def __init__(self, size, input_dims):
-	    self.size = size
-        self.states = np.zeros([self.size,5],dtype='float')
-        self.nextstates = np.zeros([self.size,5],dtype='float')
-        self.terminals = np.zeros(self.size,dtype='float')
-        self.rewards = np.zeros(self.size,dtype='float')
-        self.counter = 0
-        self.batch_counter = 0
-        self.rand_idxs = np.arange(3,300)
-        self.flag = False
-    
+		self.size = size
+		self.states = np.zeros([self.size,5],dtype='float')
+		self.nextstates = np.zeros([self.size,5],dtype='float')
+		self.terminals = np.zeros(self.size,dtype='float')
+		self.rewards = np.zeros(self.size,dtype='float')
+		self.counter = 0
+		self.batch_counter = 0
+		self.rand_idxs = np.arange(3,300)
+		self.flag = False
 
 	def get_four(self,idx):
-            four_s = np.zeros([5])
-            four_n = np.zeros([5])
-            four_s = self.states[idx]
-            four_n = self.nextstates[idx]
-            return four_s,self.terminals[idx],four_n,self.rewards[idx]
+		four_s = np.zeros([5])
+		four_n = np.zeros([5])
+		four_s = self.states[idx]
+		four_n = self.nextstates[idx]
+		return four_s,self.terminals[idx],four_n,self.rewards[idx]
 
 	def get_batches(self, bat_size):
 		bat_s = np.zeros([bat_size,5])
