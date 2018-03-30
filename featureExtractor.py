@@ -90,7 +90,11 @@ class featureExtractor:
 
 	def nextState(self, pac, blink, ink, g, action):
 		pac.pacmove(g, action)
-		blink.blinkymove(g, pac)
+		if blink.speedlim is 0:
+			blink.blinkymove(g, pac)
+			blink.speedlim = 1
+		else:
+			blink.speedlim = 0
 		#ink.inkymove(g, pac)
 		
 	def getBlinkyNewPos(self, pac, blink, G, action):

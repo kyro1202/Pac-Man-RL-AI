@@ -293,6 +293,7 @@ class Blinky(Person,Pacman):
 		x = 9
 		y = 3
 		self.prev = -1
+		self.speedlim = 0
 		Person.__init__(self,x,y)
 	
 	def resetblinky(self):
