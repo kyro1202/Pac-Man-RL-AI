@@ -24,8 +24,8 @@ par = {
 	'input_dims_proc' : [5],
 	'episode_max_length': 100000,
 	'learning_interval': 1,
-	'eps': 0.7,
-	'eps_step':10000,
+	'eps': 0,
+	'eps_step':100,
 	'discount': 0.95,
 	'lr': 0.0002,
 	'save_interval':20,
@@ -47,7 +47,8 @@ class deep_pacman:
 		self.par['num_act'] = 5
 		self.build_nets()
 		self.Q_global = 0
-		self.Q_temp = np.zeros(5)
+		self.Q_temp = np.zeros(4)
+		self.state123 = np.zeros(5)
 		self.cost_disp = 0
 		self.validactions = []
 
@@ -98,11 +99,11 @@ class deep_pacman:
 					print 'Model saved'
 				
 				state_proc_old = np.copy(state_proc)			
-				state_proc = engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,action) 
+				state_proc = engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,action)
 				reward, terminal = engine.next(HERO,VILLIAN,VILLIAN2,GAME,action) #IMP: newstate contains terminal info
 				total_reward_ep = total_reward_ep + reward
 				local_cnt+=1	
-				self.par['eps'] = max(0.2,1.0 - float(cnt)/float(self.par['eps_step']))
+				self.par['eps'] = 0.0
 				pygame.display.flip()
 
 			sys.stdout.write("Epi: %d | frame: %d | train_step: %d | time: %f | reward: %f | eps: %f " % (numeps,local_cnt,cnt, time.time()-s, total_reward_ep,self.par['eps']))
@@ -118,29 +119,55 @@ class deep_pacman:
 				#greedy with random tie-breaking
 				'''Q_temp is a array which stores the Q values for every possible action from this state - return action for which Q_temp is max'''
 				if self.validactions[0] == 1:
-					self.Q_temp[0] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,0),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
+					self.state123 = engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,0)
+					self.Q_temp[0] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: self.state123,self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
+					if GAME.grid[HERO.y][HERO.x + 1] == 0:
+						self.Q_temp[0] += 10
+					if HERO.dirc == 1:
+						self.Q_temp[0] -= 1
+					if [HERO.x + 1, HERO.y] == [VILLIAN.x, VILLIAN.y] or [HERO.x + 1, HERO.y] == engine.getBlinkyNewPos(HERO,VILLIAN,GAME,0):
+						self.Q_temp -= 100
 				else:
 					self.Q_temp[0] = -150
 				if self.validactions[1] == 1:
 					self.Q_temp[1] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,1),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
+					if GAME.grid[HERO.y][HERO.x - 1] == 0:
+						self.Q_temp[1] += 10
+					if HERO.dirc == 0:
+						self.Q_temp[1] -= 1
+					if [HERO.x - 1, HERO.y] == [VILLIAN.x, VILLIAN.y] or [HERO.x - 1, HERO.y] == engine.getBlinkyNewPos(HERO,VILLIAN,GAME,1):
+						self.Q_temp[1] -= 100
 				else:
 					self.Q_temp[1] = -150
 				if self.validactions[2] == 1:
 					self.Q_temp[2] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,2),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
+					if GAME.grid[HERO.y - 1][HERO.x] == 0:
+						self.Q_temp[2] += 10
+					if HERO.dirc == 3:
+						self.Q_temp[2] -= 1
+					if [HERO.x, HERO.y - 1] == [VILLIAN.x, VILLIAN.y] or [HERO.x, HERO.y - 1] == engine.getBlinkyNewPos(HERO,VILLIAN,GAME,2):
+						self.Q_temp -= 100
 				else:
 					self.Q_temp[2] = -150
 				if self.validactions[3] == 1:
 					self.Q_temp[3] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,3),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
+					if GAME.grid[HERO.y + 1][HERO.x] == 0:
+						self.Q_temp[3] += 10
+					if HERO.dirc == 2:
+						self.Q_temp[3] -= 1
+					if [HERO.x, HERO.y + 1] == [VILLIAN.x, VILLIAN.y] or [HERO.x, HERO.y + 1] == engine.getBlinkyNewPos(HERO,VILLIAN,GAME,3):
+						self.Q_temp -= 100
 				else:
 					self.Q_temp[3] = -150
-				self.Q_temp[4] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,-1),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
+				'''self.Q_temp[4] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,-1),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check'''
+				print self.Q_temp
 				self.Q_global = max(self.Q_global,np.amax(self.Q_temp))
 				action = self.Q_temp.tolist().index(max(self.Q_temp))
 				return action
 			else:
-				x = np.random.randint(0, 5)
+				x = np.random.randint(0, 4)
 				while x != 4 and self.validactions[x] == 0:
-					x = np.random.randint(0, 5)
+					x = np.random.randint(0, 4)
 				return x
 
 if __name__ == "__main__":
