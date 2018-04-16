@@ -90,46 +90,47 @@ class featureExtractor:
 
 	def nextState(self, pac, blink, ink, g, action):
 		pac.pacmove(g, action)
-		if blink.speedlim is 0:
+		if blink.speedlim == 0:
 			blink.blinkymove(g, pac)
 			blink.speedlim = 1
 		else:
 			blink.speedlim = 0
-		#ink.inkymove(g, pac)
-		
 	def getBlinkyNewPos(self, pac, blink, G, action):
 		## ACTION SHOULD BE VALID
 		[dx, dy] = self.Action(action)
-		if (blink.x, blink.y) not in G.intersections:
-			if ([blink.x-1, blink.y] not in G.wall and blink.prev != 1) :
-				move = 0
-			elif ([blink.x+1, blink.y] not in G.wall and blink.prev != 0):
-				move = 1
-			elif ([blink.x, blink.y-1] not in G.wall and blink.prev != 3):
-				move = 2
-			elif ([blink.x, blink.y+1] not in G.wall and blink.prev != 2):
-				move = 3
+		if blink.speedlim == 0:
+			if (blink.x, blink.y) not in G.intersections:
+				if ([blink.x-1, blink.y] not in G.wall and blink.prev != 1) :
+					move = 0
+				elif ([blink.x+1, blink.y] not in G.wall and blink.prev != 0):
+					move = 1
+				elif ([blink.x, blink.y-1] not in G.wall and blink.prev != 3):
+					move = 2
+				elif ([blink.x, blink.y+1] not in G.wall and blink.prev != 2):
+					move = 3
+			else:
+				dist = [1000,1000,1000,1000]
+				if [blink.x-1, blink.y] not in G.wall:
+					dist[0] = math.sqrt((pac.x + dx -blink.x+1)*(pac.x + dx -blink.x+1)+(pac.y + dy -blink.y)*(pac.y + dy -blink.y))
+				if [blink.x+1, blink.y] not in G.wall:
+					dist[1] = math.sqrt((pac.x + dx -blink.x-1)*(pac.x + dx -blink.x-1)+(pac.y + dy -blink.y)*(pac.y + dy -blink.y))
+				if [blink.x,blink.y-1] not in G.wall:
+					dist[2] = math.sqrt((pac.x + dx -blink.x)*(pac.x + dx -blink.x)+(pac.y + dy -blink.y+1)*(pac.y + dy -blink.y+1))
+				if [blink.x,blink.y+1] not in G.wall:
+					dist[3] = math.sqrt((pac.x + dx -blink.x)*(pac.x + dx - blink.x)+(pac.y + dy -blink.y-1)*(pac.y + dy -blink.y-1))
+				#print dist
+				move = dist.index(min(dist))
+				#print move
+			if move == 0:
+				return [blink.x - 1, blink.y]
+			elif move == 1:
+				return [blink.x + 1, blink.y]
+			elif move == 2:
+				return [blink.x, blink.y - 1]
+			elif move == 3:
+				return [blink.x, blink.y + 1]
 		else:
-			dist = [1000,1000,1000,1000]
-			if [blink.x-1, blink.y] not in G.wall:
-				dist[0] = math.sqrt((pac.x + dx -blink.x+1)*(pac.x + dx -blink.x+1)+(pac.y + dy -blink.y)*(pac.y + dy -blink.y))
-			if [blink.x+1, blink.y] not in G.wall:
-				dist[1] = math.sqrt((pac.x + dx -blink.x-1)*(pac.x + dx -blink.x-1)+(pac.y + dy -blink.y)*(pac.y + dy -blink.y))
-			if [blink.x,blink.y-1] not in G.wall:
-				dist[2] = math.sqrt((pac.x + dx -blink.x)*(pac.x + dx -blink.x)+(pac.y + dy -blink.y+1)*(pac.y + dy -blink.y+1))
-			if [blink.x,blink.y+1] not in G.wall:
-				dist[3] = math.sqrt((pac.x + dx -blink.x)*(pac.x + dx - blink.x)+(pac.y + dy -blink.y-1)*(pac.y + dy -blink.y-1))
-			#print dist
-			move = dist.index(min(dist))
-			#print move
-		if move == 0:
-			return [blink.x - 1, blink.y]
-		elif move == 1:
-			return [blink.x + 1, blink.y]
-		elif move == 2:
-			return [blink.x, blink.y - 1]
-		elif move == 3:
-			return [blink.x, blink.y + 1]
+			return blink.x, blink.y
 
 	def getInkyNewPos(self, pac, ink, G, action):
 		## ACTION SHOULD BE VALID
@@ -296,26 +297,26 @@ class featureExtractor:
 	def getFeatures(self, pac, blink, ink, g, action):
 		## ACTION SHOULD BE VALID
 		if self.getBlinkyDist(pac, blink, g, action) == 0:
-			blinky_dist = -1
+			blinky_dist = -1.0
 		else:
-			blinky_dist = 1/self.getBlinkyDist(pac, blink, g, action)
-		if self.getInkyDist(pac, ink, g, action) == 0:
-			inky_dist = -1
+			blinky_dist = 1.0/self.getBlinkyDist(pac, blink, g, action)
+		'''if self.getInkyDist(pac, ink, g, action) == 0:
+			inky_dist = -1.0
 		else:
-			inky_dist = 1/self.getInkyDist(pac, ink, g, action)
+			inky_dist = 1.0/self.getInkyDist(pac, ink, g, action)'''
 		if self.getCoinDist(pac, g, action) == 0:
-			coin_dist = -1
+			coin_dist = -1.0
 		else:
-			coin_dist = 1/self.getCoinDist(pac, g, action)
+			coin_dist = 1.0/self.getCoinDist(pac, g, action)
 		if self.getIntDist(pac, g, action) == 0:
-			int_dist = -1
+			int_dist = -1.0
 		else:
-			int_dist = 1/self.getIntDist(pac, g, action)
-		prog = self.getProg(pac, g, action)/106
-		return np.transpose([[blinky_dist], [inky_dist], [coin_dist], [int_dist], [prog]])
+			int_dist = 1.0/self.getIntDist(pac, g, action)
+		prog = self.getProg(pac, g, action)/106.0
+		return np.transpose([[blinky_dist], [0.1], [coin_dist], [int_dist], [prog]])
 
 	def newGame(self):
-		return [9, 10, 1, 3, 0] 
+		return [1.0/9, 1.0/10, 1.0/1, 1.0/3, 0] 
 	
 	def getValidActions(self, pac, g):
 		right = 1
@@ -338,10 +339,10 @@ class featureExtractor:
 		
 		if [pac.x + dx, pac.y + dy] == self.getBlinkyNewPos(pac, blink, g, action) or [pac.x + dx, pac.y + dy] == [blink.x, blink.y]:
 			self.nextState(pac, blink, ink, g, action)
-			return [-100.0, 1.0]
+			return [-500.0, 1.0]
 		if self.getProg(pac, g, action) == 106:
 			self.nextState(pac, blink, ink, g, action)
-			return [100.0, 1.0]
+			return [500.0, 1.0]
 		if self.getProg(pac, g, action) == g.score + 1:
 			self.nextState(pac, blink, ink, g, action)
 			return [20.0, 0.0]
@@ -361,6 +362,7 @@ class featureExtractor:
 	def dispDir(self, pac, g):
 		distext = g.scorefont.render("Coin Direction: "+(str)(self.getDirToCoin(pac, g, 0)), 1, g.WHITE)
        		g.screen.blit(distext, (280, 670))'''
+
 
 
 
