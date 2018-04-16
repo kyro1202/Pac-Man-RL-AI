@@ -24,8 +24,8 @@ par = {
 	'input_dims_proc' : [5],
 	'episode_max_length': 100000,
 	'learning_interval': 1,
-	'eps': 0,
-	'eps_step':100,
+	'eps': 1,
+	'eps_step':10000,
 	'discount': 0.95,
 	'lr': 0.0002,
 	'save_interval':20,
@@ -61,7 +61,8 @@ class deep_pacman:
 		cnt = self.qnet.sess.run(self.qnet.global_step)
 		print 'Global step = ' + str(cnt)
 		local_cnt = 0
-		s = time.time()		
+		f1 = open("OUTPUT_1.txt","w+")
+		f2 = open("OUTPUT_2.txt","w+")	
 		for numeps in range(self.par['num_episodes']):
 			GAME = Maze()
 			HERO = Pacman()
@@ -78,6 +79,7 @@ class deep_pacman:
 			state_proc = np.zeros((5)); state_proc_old = None; terminal = None; delay = 0;
 			state_proc = engine.newGame()
 			total_reward_ep = 0
+			s = time.time()	
 			for maxl in range(self.par['episode_max_length']):
 				GAME.dispmaze()
 				GAME.drawwall() 
@@ -102,14 +104,20 @@ class deep_pacman:
 				state_proc = engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,action)
 				reward, terminal = engine.next(HERO,VILLIAN,VILLIAN2,GAME,action) #IMP: newstate contains terminal info
 				total_reward_ep = total_reward_ep + reward
-				local_cnt+=1	
-				self.par['eps'] = 0.0
+				local_cnt+=1
+				self.par['eps'] = max(0.0, 1.0 - float(cnt)/float(self.par['eps_step']))
 				pygame.display.flip()
 
 			sys.stdout.write("Epi: %d | frame: %d | train_step: %d | time: %f | reward: %f | eps: %f " % (numeps,local_cnt,cnt, time.time()-s, total_reward_ep,self.par['eps']))
 			sys.stdout.write("| max_Q: %f\n" % (self.Q_global))			
 			#sys.stdout.write("%f, %f, %f, %f, %f\n" % (self.t_e[0],self.t_e[1],self.t_e[2],self.t_e[3],self.t_e[4]))
+			f1.write("%d, %d\n" % (numeps, GAME.score))
+			f2.write("%d, %f\n" % (numeps, time.time() - s))
+			f1.flush()
+			f2.flush()
 			sys.stdout.flush()
+		f1.close()
+		f2.close()
 			
 
 	def perceive(self,HERO,VILLIAN,VILLIAN2,GAME,engine,terminal):
