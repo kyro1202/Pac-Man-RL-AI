@@ -339,13 +339,13 @@ class featureExtractor:
 		
 		if [pac.x + dx, pac.y + dy] == self.getBlinkyNewPos(pac, blink, g, action) or [pac.x + dx, pac.y + dy] == [blink.x, blink.y]:
 			self.nextState(pac, blink, ink, g, action)
-			return [-500.0, 1.0]
+			return [-100.0, 1.0]
 		if self.getProg(pac, g, action) == 106:
 			self.nextState(pac, blink, ink, g, action)
-			return [500.0, 1.0]
+			return [100.0, 1.0]
 		if self.getProg(pac, g, action) == g.score + 1:
 			self.nextState(pac, blink, ink, g, action)
-			return [20.0, 0.0]
+			return [10.0, 0.0]
 		if self.getProg(pac, g, action) == g.score:
 			self.nextState(pac, blink, ink, g, action)
 			return [-5.0, 0.0]
