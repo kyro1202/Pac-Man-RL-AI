@@ -6,7 +6,7 @@ import math
 class Maze():
 
 	def __init__(self):
-		self.BLACK = (0,0,0)
+		self.BLACK = (0,0,0) #coding or the required colors
 		self.GOLD = (246,253,49)
 		self.GREY = (50,50,50)
 		self.RED = (255,0,0)
@@ -14,7 +14,7 @@ class Maze():
 		self.WHITE = (255,255,255)	
 		self.GREEN = (0,255,0)
 		self.CYAN = (0,255,255)	
-		self.width  = 20
+		self.width  = 20 #maze dimensions
 		self.height = 20
 		self.margin = 1	
 		self.score = 0
@@ -22,7 +22,8 @@ class Maze():
 		self.num_wall = 0
 		self.grid = []
 		self.wall = []
-		self.WALL = [[0 for i in range(1000)] for j in range(1000)]
+		self.WALL = [[0 for i in range(1000)] for j in range(1000)] #2D array for wall
+		#to store the intersections
 		self.intersections = [(1,5),(4,3),(4,7),(3,5),(6,3),(6,5),(6,7),(13,3),(13,5),(13,7),(15,3),(15,7),(16,5),(18,5)]
 		self.countfinal = 0
 		self.make()
@@ -30,6 +31,7 @@ class Maze():
 		self.screen = pygame.display.set_mode(self.size)
 
 	def make(self):
+		#appending the coordinates of Walls in the array and list
 		for i in range(0,20):
 			self.wall.append([i,0])
 			self.wall.append([i,10])
@@ -128,7 +130,7 @@ class Maze():
 			self.grid[wall[1]][wall[0]]=1 	
 		return self
 
-	def reset(self):
+	def reset(self): #to reset the game
 		self.grid = []
 		self.wall = []
 		self.WALL = [[0 for i in range(1000)] for j in range(1000)]
@@ -136,6 +138,7 @@ class Maze():
 		self.make()	
 		return self
 
+	#the following functions are for drawing the respective objects
 	def scoredisp(self):
 	        scoretext=self.scorefont.render("Score: "+(str)(self.score), 1,self.WHITE)
 	        self.screen.blit(scoretext, (30, 650))
@@ -203,6 +206,7 @@ class Person(Maze):
 				self.y=(self.y)+1
 		return self
 
+#inherits the functions of Person
 class Pacman(Person):
 
 	def __init__(self):
@@ -287,6 +291,7 @@ class Pacman(Person):
 			self.pacdown(G)
 			self.dirc = 3
 
+#The Red Ghost
 class Blinky(Person,Pacman):
 
 	def __init__(self):
@@ -323,6 +328,7 @@ class Blinky(Person,Pacman):
 		pygame.draw.rect(G.screen,G.RED,[(G.margin+G.width)*self.x+G.margin,(G.margin+G.height)*self.y+G.margin,G.width,G.height])
  
 	def blinkymove(self,G,pac):
+		#if blinky not on intersection it has to follow the path
 		if (self.x,self.y) not in G.intersections:
 			if ([self.x-1,self.y] not in G.wall and self.prev != 1) :
 				move = 0
@@ -334,6 +340,7 @@ class Blinky(Person,Pacman):
 				move = 3
 			self.prev = move
 		else:
+			#blinky moves to the tile from which the straight line distance from pacman is the least
 			dist = [1000,1000,1000,1000]
 			if [self.x-1,self.y] not in G.wall:
 				dist[0] = math.sqrt((pac.x-self.x+1)*(pac.x-self.x+1)+(pac.y-self.y)*(pac.y-self.y))
@@ -356,6 +363,7 @@ class Blinky(Person,Pacman):
 		elif move == 3:
 			self.bdown(G)
 
+#The blue ghost
 class Inky(Person,Pacman):
     
 	def __init__(self):
@@ -391,6 +399,7 @@ class Inky(Person,Pacman):
 		pygame.draw.rect(G.screen,G.CYAN,[(G.margin+G.width)*self.x+G.margin,(G.margin+G.height)*self.y+G.margin,G.width,G.height])
  
 	def inkymove(self,G,pac):
+		#if inky not on interection it has to follow the path
 		if (self.x,self.y) not in G.intersections:
 			if ([self.x-1,self.y] not in G.wall and self.prev != 1) :
 				move = 0
@@ -402,6 +411,8 @@ class Inky(Person,Pacman):
 				move = 3
 			self.prev = move
 		else:
+			#inky moves to the tile from which straight line distance to the target tile is the least
+			#target tile is the second tile infront of pacman
 			dist = [1000,1000,1000,1000]
 			tx = 0
 			ty = 0
