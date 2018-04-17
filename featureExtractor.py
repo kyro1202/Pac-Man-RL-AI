@@ -98,7 +98,7 @@ class featureExtractor:
 		else:
 			blink.speedlim = 0
 	def getBlinkyNewPos(self, pac, blink, G, action):
-		## ACTION SHOULD BE VALID
+		#returns blinky's new position according to the ghosts AI
 		[dx, dy] = self.Action(action)
 		if blink.speedlim == 0:
 			if (blink.x, blink.y) not in G.intersections:
@@ -135,7 +135,7 @@ class featureExtractor:
 			return blink.x, blink.y
 
 	def getInkyNewPos(self, pac, ink, G, action):
-		## ACTION SHOULD BE VALID
+		#returns inky's new position according to the ghost AI
 		[dx, dy] = self.Action(action)
 		'''if (ink.x,ink.y) not in G.intersections:
 			if ([ink.x-1,ink.y] not in G.wall and ink.prev != 1) :
@@ -185,8 +185,7 @@ class featureExtractor:
 		
 
 	def getInkyDist(self, pac, ink, g, action):
-		## ACTION SHOULD BE VALID
-		## BFS
+		'''returns distance to inky using simple bfs'''
 		visited = [[0 for i in range(1000)] for j in range(1000)]
 		Q = Queue()
 		dist = 0
@@ -213,8 +212,7 @@ class featureExtractor:
 				print g.WALL[pac.x + dx][pac.y + dy], g.WALL[inky_x][inky_y]
 
 	def getBlinkyDist(self, pac, blink, g, action):
-		## ACTION SHOULD BE VALID
-		## BFS
+		#returns blinky's distance using standard bfs
 		visited = [[0 for i in range(1000)] for j in range(1000)]
 		Q = Queue()
 		dist = 0
@@ -240,8 +238,7 @@ class featureExtractor:
 			if Q.isEmpty():
 				print g.WALL[pac.x + dx][pac.y + dy], g.WALL[blinky_x][blinky_y]
 	def getCoinDist(self, pac, g, action):
-		## ACTION SHOULD BE VALID
-		## BFS
+		#returns the distance to the nearest coin
 		visited = [[0 for i in range(1000)] for j in range(1000)]
 		Q = Queue()
 		dist = 0
@@ -265,8 +262,7 @@ class featureExtractor:
 				return 0
 
 	def getIntDist(self, pac, g, action):
-		## ACTION SHOULD BE VALID
-		## BFS
+		#returns the distance to the nearest intersection
 		visited = [[0 for i in range(1000)] for j in range(1000)]
 		Q = Queue()
 		dist = 0
@@ -290,14 +286,14 @@ class featureExtractor:
 				return 0
 
 	def getProg(self, pac, g, action):
-		## ACTION SHOULD BE VALID
+		#returns the progress so far
 		[dx, dy] = self.Action(action)
 		if g.grid[pac.y + dy][pac.x + dx] == 0:
 			return (g.score + 1)
 		return g.score
 		
 	def getFeatures(self, pac, blink, ink, g, action):
-		## ACTION SHOULD BE VALID
+		#returns all the required features
 		if self.getBlinkyDist(pac, blink, g, action) == 0:
 			blinky_dist = -1.0
 		else:
@@ -366,6 +362,7 @@ class featureExtractor:
 		return [right, left, up, down]
 	
 	def next(self, pac, blink, ink, g, action):
+		#performs the action and returns the reward and terminal info
 		terminal = 0
 		[dx, dy] = self.Action(action)
 		
