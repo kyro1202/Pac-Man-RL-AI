@@ -77,6 +77,7 @@ class PriorityQueue:
 class featureExtractor:
 	
 	def Action(self, action):
+		#how coordinates change for the action
 		if action == -1:
 			return [0, 0]
 		elif action == 0:
@@ -89,6 +90,7 @@ class featureExtractor:
  			return [0, 1]
 
 	def nextState(self, pac, blink, ink, g, action):
+		#for producing the next state
 		pac.pacmove(g, action)
 		if blink.speedlim == 0:
 			blink.blinkymove(g, pac)
