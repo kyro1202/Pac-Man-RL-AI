@@ -30,7 +30,7 @@ Deep Q neural networks for ATARI games
 
 Use :
 To see the trained model execute 
-python train.py ckpt/model_1080
+python train.py ckpt/model_1300
 To start the training from initial state execute
 delete the checkpoints saved in folder ckpt
 python train.py
