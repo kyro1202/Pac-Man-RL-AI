@@ -48,7 +48,7 @@ class deep_pacman:
 		self.build_nets() 
 		self.Q_global = 0
 		self.Q_temp = np.zeros(4) #to store Q_temp for every action
-		self.state123 = np.zeros(5)
+		self.state_temp = np.zeros(5)
 		self.cost_disp = 0 
 		self.validactions = [] #if validactions[index] = 1, action corresponding to that index can't be taken
 
@@ -65,13 +65,13 @@ class deep_pacman:
 		f2 = open("OUTPUT_2.txt","w+") 
 		for numeps in range(self.par['num_episodes']):
 			GAME = Maze() #declaring objects of the respective classes
-			HERO = Pacman()
-			VILLIAN = Blinky()
-			VILLIAN2 = Inky()
+			AGENT = Pacman()
+			GHOST = Blinky()
+			GHOST2 = Inky()
 			GAME.reset() #to initialize to new game state
-			HERO.resetpacman()
-			VILLIAN.resetblinky()
-			VILLIAN2.resetinky()
+			AGENT.resetpacman()
+			GHOST.resetblinky()
+			GHOST2.resetinky()
 			pygame.init()
 			GAME.scorefont = pygame.font.Font(None,30)
 			engine = featureExtractor()
@@ -83,12 +83,12 @@ class deep_pacman:
 			for maxl in range(self.par['episode_max_length']):
 				GAME.dispmaze() #drawing the game elements
 				GAME.drawwall() 
-				HERO.draw(GAME)
-				VILLIAN.draw(GAME)
-				#VILLIAN2.draw(GAME)				
+				AGENT.draw(GAME)
+				GHOST.draw(GAME)
+				#GHOST2.draw(GAME)				
 				if state_proc_old is not None: #if we have old state stored
 					self.DB.insert(state_proc_old,reward,terminal,state_proc) #inserting the data in the database
-				action = self.perceive(HERO,VILLIAN,VILLIAN2,GAME,engine,terminal) #function to select the action
+				action = self.choose_action(AGENT,GHOST,GHOST2,GAME,engine,terminal) #function to select the action
 				if action == 4:
 					action = -1
 				if action == None: #game over condition, break the loop, start new episode
@@ -101,8 +101,8 @@ class deep_pacman:
 					print 'Model saved'
 				
 				state_proc_old = np.copy(state_proc) #copying the state in old state			
-				state_proc = engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,action) #getting state features for current state
-				reward, terminal = engine.next(HERO,VILLIAN,VILLIAN2,GAME,action) #performing the chosen action and saving reward
+				state_proc = engine.getFeatures(AGENT,GHOST,GHOST2,GAME,action) #getting state features for current state
+				reward, terminal = engine.next(AGENT,GHOST,GHOST2,GAME,action) #performing the chosen action and saving reward
 				total_reward_ep = total_reward_ep + reward
 				local_cnt+=1
 				self.par['eps'] = 0.0
@@ -119,37 +119,37 @@ class deep_pacman:
 		f1.close() #closing the file
 		f2.close()
 
-	def perceive(self,HERO,VILLIAN,VILLIAN2,GAME,engine,terminal): #function outputs the action to be taken
+	def choose_action(self,AGENT,GHOST,GHOST2,GAME,engine,terminal): #function outputs the action to be taken
 		if not terminal:	
 			#getting the valid actions
-			self.validactions = engine.getValidActions(HERO,GAME)
+			self.validactions = engine.getValidActions(AGENT,GAME)
 			#choosing action acc. to epsilon greedy policy
 			if np.random.rand() > self.par['eps']: #if random number is more than epsilon - exploitation
 				#greedy with random tie-breaking
 				'''Q_temp is a array which stores the Q values for every possible action from this state - return action for which Q_temp is max'''
 				#storing the Q value obtained from the network in Q temp
 				if self.validactions[0] == 1:
-					self.state123 = engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,0)
-					self.Q_temp[0] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: self.state123,self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
-					engine.reward_update(self, HERO, VILLIAN, VILLIAN2, GAME, engine, 0)
+					self.state_temp = engine.getFeatures(AGENT,GHOST,GHOST2,GAME,0)
+					self.Q_temp[0] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: self.state_temp,self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
+					engine.reward_update(self, AGENT, GHOST, GHOST2, GAME, engine, 0)
 				else:
 					self.Q_temp[0] = -150
 				if self.validactions[1] == 1:
-					self.Q_temp[1] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,1),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
-					engine.reward_update(self, HERO, VILLIAN, VILLIAN2, GAME, engine, 1)
+					self.Q_temp[1] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(AGENT,GHOST,GHOST2,GAME,1),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
+					engine.reward_update(self, AGENT, GHOST, GHOST2, GAME, engine, 1)
 				else:
 					self.Q_temp[1] = -150
 				if self.validactions[2] == 1:
-					self.Q_temp[2] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,2),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
-					engine.reward_update(self, HERO, VILLIAN, VILLIAN2, GAME, engine, 2)
+					self.Q_temp[2] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(AGENT,GHOST,GHOST2,GAME,2),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
+					engine.reward_update(self, AGENT, GHOST, GHOST2, GAME, engine, 2)
 				else:
 					self.Q_temp[2] = -150
 				if self.validactions[3] == 1:
-					self.Q_temp[3] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,3),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
-					engine.reward_update(self, HERO, VILLIAN, VILLIAN2, GAME, engine, 3)
+					self.Q_temp[3] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(AGENT,GHOST,GHOST2,GAME,3),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
+					engine.reward_update(self, AGENT, GHOST, GHOST2, GAME, engine, 3)
 				else:
 					self.Q_temp[3] = -150
-				'''self.Q_temp[4] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,-1),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check'''
+				'''self.Q_temp[4] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(AGENT,GHOST,GHOST2,GAME,-1),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check'''
 				print self.Q_temp
 				self.Q_global = max(self.Q_global,np.amax(self.Q_temp))
 				#action with the maximum Q value is chosen
@@ -166,5 +166,5 @@ if __name__ == "__main__":
 	#using the saved model
 	if len(sys.argv) > 1: 
 		par['ckpt_file'] = sys.argv[1]
-	da = deep_pacman(par)
-	da.start() #starting the training
+	dp = deep_pacman(par)
+	dp.start() #starting the training
