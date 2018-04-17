@@ -162,7 +162,7 @@ class Maze():
 		for wall in self.wall:
 			pygame.draw.rect(self.screen,self.BLUE,[(self.margin+self.width)*wall[0]+self.margin,(self.margin+self.height)*wall[1]+self.margin,self.width,self.height])
 
-class Person(Maze):
+class Object(Maze):
 
 	def __init__(self,x,y):
 		self.x = x	
@@ -206,20 +206,20 @@ class Person(Maze):
 				self.y=(self.y)+1
 		return self
 
-#inherits the functions of Person
-class Pacman(Person):
+#inherits the functions of Object
+class Pacman(Object):
 
 	def __init__(self):
 		x = 9
 		y = 7
 		self.dirc = -1;
-		Person.__init__(self,x,y)
+		Object.__init__(self,x,y)
 	
 	def resetpacman(self):
 		x = 9
 		y = 7
 		self.dirc = -1;
-		Person.__init__(self,x,y)
+		Object.__init__(self,x,y)
 	
 	def collectCoin(self,Wa):
 		if Wa.grid[self.y][self.x] == 0:
@@ -228,28 +228,28 @@ class Pacman(Person):
 			return False
 
 	def pacleft(self,Wa):
-		Person.moveleft(self,Wa.wall)
+		Object.moveleft(self,Wa.wall)
 		if self.collectCoin(Wa):	    
 			Wa.grid[self.y][self.x]=1
 			Wa.score += 1
 		return self
 
 	def pacright(self,Wa):
-		Person.moveright(self,Wa.wall)
+		Object.moveright(self,Wa.wall)
 		if self.collectCoin(Wa):	    
 			Wa.grid[self.y][self.x]=1
 			Wa.score += 1
 		return self
 
 	def pacup(self,Wa):
-		Person.moveup(self,Wa.wall)
+		Object.moveup(self,Wa.wall)
 		if self.collectCoin(Wa):	    
 			Wa.grid[self.y][self.x]=1
 			Wa.score += 1
 		return self
 
 	def pacdown(self,Wa):
-		Person.movedown(self,Wa.wall)
+		Object.movedown(self,Wa.wall)
 		if self.collectCoin(Wa):	    
 			Wa.grid[self.y][self.x]=1
 			Wa.score += 1
@@ -292,36 +292,36 @@ class Pacman(Person):
 			self.dirc = 3
 
 #The Red Ghost
-class Blinky(Person,Pacman):
+class Blinky(Object,Pacman):
 
 	def __init__(self):
 		x = 9
 		y = 3
 		self.prev = -1
 		self.speedlim = 0
-		Person.__init__(self,x,y)
+		Object.__init__(self,x,y)
 	
 	def resetblinky(self):
 		x = 9
 		y = 3
 		prev = 0
-		Person.__init__(self,x,y)
+		Object.__init__(self,x,y)
 		return self
 
 	def bleft(self,Wa):
-		Person.moveleft(self,Wa.wall)
+		Object.moveleft(self,Wa.wall)
 		return self
 
 	def bright(self,Wa):
-		Person.moveright(self,Wa.wall)
+		Object.moveright(self,Wa.wall)
 		return self
 
 	def bup(self,Wa):
-		Person.moveup(self,Wa.wall)
+		Object.moveup(self,Wa.wall)
 		return self
 
 	def bdown(self,Wa):
-		Person.movedown(self,Wa.wall)
+		Object.movedown(self,Wa.wall)
 		return self
 
 	def draw(self,G):
@@ -364,35 +364,35 @@ class Blinky(Person,Pacman):
 			self.bdown(G)
 
 #The blue ghost
-class Inky(Person,Pacman):
+class Inky(Object,Pacman):
     
 	def __init__(self):
 		x = 10
 		y = 3
 		self.prev = -1
-		Person.__init__(self,x,y)
+		Object.__init__(self,x,y)
 	
 	def resetinky(self):
 		x = 10
 		y = 3
 		self.prev = -1 
-		Person.__init__(self,x,y)
+		Object.__init__(self,x,y)
 		return self
 
 	def ileft(self,Wa):
-		Person.moveleft(self,Wa.wall)
+		Object.moveleft(self,Wa.wall)
 		return self
 
 	def iright(self,Wa):
-		Person.moveright(self,Wa.wall)
+		Object.moveright(self,Wa.wall)
 		return self
 
 	def iup(self,Wa):
-		Person.moveup(self,Wa.wall)
+		Object.moveup(self,Wa.wall)
 		return self
 
 	def idown(self,Wa):
-		Person.movedown(self,Wa.wall)
+		Object.movedown(self,Wa.wall)
 		return self
 
 	def draw(self,G):
