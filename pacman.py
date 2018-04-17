@@ -1,3 +1,6 @@
+'''this file is used to run the game without the network 
+to play the game normally by a human player'''
+
 import pygame
 from pygame.locals import * 
 from random import randint
