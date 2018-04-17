@@ -316,34 +316,34 @@ class featureExtractor:
 	def newGame(self):
 		return [1.0/9, 1.0/10, 1.0/1, 1.0/3, 0] 
 	
-	def reward_update(self, deep_pac, HERO, VILLIAN, VILLIAN2, GAME, engine, action):
+	def reward_update(self, deep_pac, AGENT, GHOST, GHOST2, GAME, engine, action):
 		if action == 0:
-			if GAME.grid[HERO.y][HERO.x + 1] == 0:
+			if GAME.grid[AGENT.y][AGENT.x + 1] == 0:
 				deep_pac.Q_temp[0] += 10
-			if HERO.dirc == 1:
+			if AGENT.dirc == 1:
 				deep_pac.Q_temp[0] -= 1
-			if [HERO.x + 1, HERO.y] == [VILLIAN.x, VILLIAN.y] or [HERO.x + 1, HERO.y] == engine.getBlinkyNewPos(HERO,VILLIAN,GAME,0):
+			if [AGENT.x + 1, AGENT.y] == [GHOST.x, GHOST.y] or [AGENT.x + 1, AGENT.y] == engine.getBlinkyNewPos(AGENT,GHOST,GAME,0):
 				deep_pac.Q_temp[0] -= 100
 		elif action == 1:
-			if GAME.grid[HERO.y][HERO.x - 1] == 0:
+			if GAME.grid[AGENT.y][AGENT.x - 1] == 0:
 				deep_pac.Q_temp[1] += 10
-			if HERO.dirc == 0:
+			if AGENT.dirc == 0:
 				deep_pac.Q_temp[1] -= 1
-			if [HERO.x - 1, HERO.y] == [VILLIAN.x, VILLIAN.y] or [HERO.x - 1, HERO.y] == engine.getBlinkyNewPos(HERO,VILLIAN,GAME,1):
+			if [AGENT.x - 1, AGENT.y] == [GHOST.x, GHOST.y] or [AGENT.x - 1, AGENT.y] == engine.getBlinkyNewPos(AGENT,GHOST,GAME,1):
 				deep_pac.Q_temp[1] -= 100
 		elif action == 2:
-			if GAME.grid[HERO.y - 1][HERO.x] == 0:
+			if GAME.grid[AGENT.y - 1][AGENT.x] == 0:
 				deep_pac.Q_temp[2] += 10
-			if HERO.dirc == 3:
+			if AGENT.dirc == 3:
 				deep_pac.Q_temp[2] -= 1
-			if [HERO.x, HERO.y - 1] == [VILLIAN.x, VILLIAN.y] or [HERO.x, HERO.y - 1] == engine.getBlinkyNewPos(HERO,VILLIAN,GAME,2):
+			if [AGENT.x, AGENT.y - 1] == [GHOST.x, GHOST.y] or [AGENT.x, AGENT.y - 1] == engine.getBlinkyNewPos(AGENT,GHOST,GAME,2):
 				deep_pac.Q_temp[2] -= 100
 		elif action == 3:
-			if GAME.grid[HERO.y + 1][HERO.x] == 0:
+			if GAME.grid[AGENT.y + 1][AGENT.x] == 0:
 				deep_pac.Q_temp[3] += 10
-			if HERO.dirc == 2:
+			if AGENT.dirc == 2:
 				deep_pac.Q_temp[3] -= 1
-			if [HERO.x, HERO.y + 1] == [VILLIAN.x, VILLIAN.y] or [HERO.x, HERO.y + 1] == engine.getBlinkyNewPos(HERO,VILLIAN,GAME,3):
+			if [AGENT.x, AGENT.y + 1] == [GHOST.x, GHOST.y] or [AGENT.x, AGENT.y + 1] == engine.getBlinkyNewPos(AGENT,GHOST,GAME,3):
 				deep_pac.Q_temp[3] -= 100
 	
 	def getValidActions(self, pac, g):
