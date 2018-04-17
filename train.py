@@ -24,7 +24,7 @@ par = {
 	'input_dims_proc' : [5],
 	'episode_max_length': 100000,
 	'learning_interval': 1,
-	'eps': 1,
+	'eps': 0.0,
 	'eps_step':10000,
 	'discount': 0.95,
 	'lr': 0.0002,
@@ -105,7 +105,7 @@ class deep_pacman:
 				reward, terminal = engine.next(HERO,VILLIAN,VILLIAN2,GAME,action) #IMP: newstate contains terminal info
 				total_reward_ep = total_reward_ep + reward
 				local_cnt+=1
-				self.par['eps'] = max(0.0, 1.0 - float(cnt)/float(self.par['eps_step']))
+				self.par['eps'] = 0.0
 				pygame.display.flip()
 
 			sys.stdout.write("Epi: %d | frame: %d | train_step: %d | time: %f | reward: %f | eps: %f " % (numeps,local_cnt,cnt, time.time()-s, total_reward_ep,self.par['eps']))
@@ -128,22 +128,22 @@ class deep_pacman:
 				if self.validactions[0] == 1:
 					self.state123 = engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,0)
 					self.Q_temp[0] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: self.state123,self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
-					engine.reward_update(HERO, VILLIAN, VILLIAN2, GAME, engine, 0)
+					engine.reward_update(self, HERO, VILLIAN, VILLIAN2, GAME, engine, 0)
 				else:
 					self.Q_temp[0] = -150
 				if self.validactions[1] == 1:
 					self.Q_temp[1] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,1),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
-					engine.reward_update(HERO, VILLIAN, VILLIAN2, GAME, engine, 1)
+					engine.reward_update(self, HERO, VILLIAN, VILLIAN2, GAME, engine, 1)
 				else:
 					self.Q_temp[1] = -150
 				if self.validactions[2] == 1:
 					self.Q_temp[2] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,2),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
-					engine.reward_update(HERO, VILLIAN, VILLIAN2, GAME, engine, 2)
+					engine.reward_update(self, HERO, VILLIAN, VILLIAN2, GAME, engine, 2)
 				else:
 					self.Q_temp[2] = -150
 				if self.validactions[3] == 1:
 					self.Q_temp[3] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,3),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check
-					engine.reward_update(HERO, VILLIAN, VILLIAN2, GAME, engine, 3)
+					engine.reward_update(self, HERO, VILLIAN, VILLIAN2, GAME, engine, 3)
 				else:
 					self.Q_temp[3] = -150
 				'''self.Q_temp[4] = self.qnet.sess.run(self.qnet.y, feed_dict = {self.qnet.x: engine.getFeatures(HERO,VILLIAN,VILLIAN2,GAME,-1),self.qnet.q_value: np.zeros(1) , self.qnet.rewards: np.zeros(1)})[0] #TODO check'''
