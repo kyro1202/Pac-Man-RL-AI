@@ -4,7 +4,9 @@ import time
 
 class database:
 	def __init__(self, size, input_dims):
-		self.size = size
+		'''size stores the total size of the database
+		counter is to keep track of overflow in size'''
+		self.size = size 
 		self.states = np.zeros([self.size,5],dtype='float')
 		self.nextstates = np.zeros([self.size,5],dtype='float')
 		self.terminals = np.zeros(self.size,dtype='float')
@@ -15,6 +17,7 @@ class database:
 		self.flag = False
 
 	def get_four(self,idx):
+		'''it returns the state nextstate reward terminal corresponding to the index in database'''
 		four_s = np.zeros([5])
 		four_n = np.zeros([5])
 		four_s = self.states[idx]
@@ -27,6 +30,7 @@ class database:
 		bat_n = np.zeros([bat_size,5])
 		bat_r = np.zeros([bat_size])
 		ss = time.time()
+		#mini batches of data are formed from taking the jumbled data in the database
 		for i in range(bat_size):
 			if self.batch_counter >= len(self.rand_idxs) - bat_size :
 				self.rand_idxs = np.arange(3,self.get_size()-1)
@@ -39,7 +43,8 @@ class database:
 		e3 = time.time()-ss
 		return bat_s,bat_t,bat_n,bat_r
 
-	def insert(self, prevstate_proc,reward,terminal,newstate_proc):
+	def insert(self, prevstate_proc,reward,terminal,newstate_proc): 
+		#inserting the data in the database
 		self.states[self.counter] = prevstate_proc
 		self.nextstates[self.counter] = newstate_proc
 		self.rewards[self.counter] = reward
